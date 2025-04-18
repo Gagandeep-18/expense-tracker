@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expense Tracker</title>
+  <style>:root {
+    --green: #2ecc71;
+    --red: #e74c3c;
+    --dark: #2c3e50;
+    --light: #ecf0f1;
+    --white-glass: rgba(255, 255, 255, 0.25);
+    --backdrop: blur(10px);
+  }
+  
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+  
+  .container {
+    width: 90%;
+    max-width: 420px;
+    background: var(--white-glass);
+    border-radius: 20px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    backdrop-filter: var(--backdrop);
+    padding: 2rem;
+    color: var(--dark);
+    transition: 0.3s ease;
+  }
+  
+  .container:hover {
+    transform: scale(1.01);
+  }
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--dark);
+    font-weight: bold;
+  }
+  
+  .balance {
+    text-align: center;
+    font-size: 1.4rem;
+    margin: 1rem 0;
+    font-weight: 600;
+  }
+  
+  .income-expense {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+  }
+  
+  .income, .expense {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .income h4, .expense h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+  
+  .income p {
+    color: var(--green);
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .expense p {
+    color: var(--red);
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+  }
+  
+  ul li {
+    background: rgba(255, 255, 255, 0.6);
+    margin: 0.5rem 0;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: 6px solid;
+    transition: all 0.3s ease;
+    animation: fadeIn 0.4s ease forwards;
+  }
+  
+  ul li.plus {
+    border-color: var(--green);
+  }
+  
+  ul li.minus {
+    border-color: var(--red);
+  }
+  
+  ul li:hover {
+    transform: translateX(5px);
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  ul li button {
+    background: none;
+    border: none;
+    color: var(--dark);
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    transition: color 0.3s;
+  }
+  
+  ul li button:hover {
+    color: var(--red);
+  }
+  
+  form {
+    margin-top: 2rem;
+  }
+  
+  form input, form button {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+  }
+  
+  form input {
+    border: 1px solid #ccc;
+    background: #fff;
+  }
+  
+  form button {
+    background: var(--dark);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+  }
+  
+  form button:hover {
+    background: #1a242f;
+    transform: scale(1.02);
+  }
+  
+  @media (max-width: 400px) {
+    .income-expense {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+  
+</head>
+<body>
+
+  <div class="container">
+    <h2>Expense Tracker</h2>
+    <div class="balance">
+      <h4>Your Balance</h4>
+      <h3 id="balance">$0.00</h3>
+    </div>
+
+    <div class="income-expense">
+      <div class="income">
+        <h4>Income</h4>
+        <p id="money-plus">+$0.00</p>
+      </div>
+      <div class="expense">
+        <h4>Expense</h4>
+        <p id="money-minus">-$0.00</p>
+      </div>
+    </div>
+
+    <h4>History</h4>
+    <ul id="list"></ul>
+
+    <h4>Add new transaction</h4>
+    <form id="form">
+      <input type="text" id="text" placeholder="Enter text" required />
+      <input type="number" id="amount" placeholder="Enter amount (negative = expense)" required />
+      <button type="submit">Add Transaction</button>
+    </form>
+  </div>
+
+  <script>
+    // DOM elements
+    const balance = document.getElementById('balance');
+    const moneyPlus = document.getElementById('money-plus');
+    const moneyMinus = document.getElementById('money-minus');
+    const list = document.getElementById('list');
+    const form = document.getElementById('form');
+    const text = document.getElementById('text');
+    const amount = document.getElementById('amount');
+  
+    // Load transactions from local storage
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  
+    // Format number as INR currency
+    const formatINR = val =>
+      `₹${Number(val).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+  
+    // Update balance, income, and expenses
+    function updateValues() {
+      const amounts = transactions.map(t => t.amount);
+      const total = amounts.reduce((a, b) => a + b, 0).toFixed(2);
+      const income = amounts.filter(a => a > 0).reduce((a, b) => a + b, 0).toFixed(2);
+      const expense = amounts.filter(a => a < 0).reduce((a, b) => a + b, 0).toFixed(2);
+  
+      balance.innerText = formatINR(total);
+      moneyPlus.innerText = `+${formatINR(income)}`;
+      moneyMinus.innerText = `-${formatINR(Math.abs(expense))}`;
+    }
+  
+    // Add transaction to list
+    function addTransactionDOM({ id, text: desc, amount }) {
+      const sign = amount < 0 ? '-' : '+';
+      const li = document.createElement('li');
+      li.className = amount < 0 ? 'minus' : 'plus';
+      li.innerHTML = `
+        ${desc} <span>${sign}${formatINR(Math.abs(amount))}</span>
+        <button onclick="removeTransaction(${id})">x</button>`;
+      list.appendChild(li);
+    }
+  
+    // Remove transaction by ID
+    function removeTransaction(id) {
+      transactions = transactions.filter(t => t.id !== id);
+      updateLocalStorage();
+      init();
+    }
+  
+    // Save to localStorage
+    const updateLocalStorage = () =>
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+  
+    // Initialize app
+    function init() {
+      list.innerHTML = '';
+      transactions.forEach(addTransactionDOM);
+      updateValues();
+    }
+  
+    // Handle form submit
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+  
+      const desc = text.value.trim();
+      const amt = +amount.value.trim();
+  
+      if (!desc || isNaN(amt)) {
+        alert('Please add a valid text and amount');
+        return;
+      }
+  
+      const transaction = { id: Date.now(), text: desc, amount: amt };
+      transactions.push(transaction);
+      addTransactionDOM(transaction);
+      updateValues();
+      updateLocalStorage();
+  
+      text.value = '';
+      amount.value = '';
+    });
+  
+    init();
+  </script>
+  
+
+</body>
+</html>
